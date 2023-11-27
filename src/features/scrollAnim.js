@@ -24,7 +24,7 @@ scene.add(pointLight)
 // GLTF Loader
 const loader = new GLTFLoader()
 loader.load(
-  'oldBag.glb',
+  'http://127.0.0.1:5500/public/oldBag.glb',
   (gltf) => {
     const model = gltf.scene
     model.scale.set(1, 1, 1) // Scale if needed
