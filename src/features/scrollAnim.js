@@ -1,6 +1,6 @@
-// import * as THREE from 'three'
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-// import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 // import { Reflector } from 'three/examples/jsm/objects/Reflector.js'
 // import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 
@@ -56,4 +56,4 @@ function animate() {
   controls.update()
   renderer.render(scene, camera)
 }
-// export default animate
+export default animate
