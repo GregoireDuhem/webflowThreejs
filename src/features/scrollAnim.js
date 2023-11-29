@@ -56,4 +56,4 @@ function animate() {
   controls.update()
   renderer.render(scene, camera)
 }
-export default animate
+// export default animate
