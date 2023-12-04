@@ -13,19 +13,31 @@ const camera = new THREE.PerspectiveCamera(
 )
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
-renderer.setClearColor(0xffffff, 1) // Light grey background for contrast
+renderer.setClearColor(0x777777, 1) // Light grey background for contrast
 document.body.appendChild(renderer.domElement)
 
 // Lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 5)
-scene.add(ambientLight)
-const pointLight = new THREE.PointLight(0xffffff, 200)
-pointLight.position.set(0, 2, 6)
-pointLight.distance = 100
-scene.add(pointLight)
 
-const pointLightHelper = new THREE.PointLightHelper(pointLight)
-scene.add(pointLightHelper)
+// For a directional light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 5)
+directionalLight.position.set(0, 10, 20) // Position above the ground
+directionalLight.target.position.set(0, 0, 0) // Target at the ground
+scene.add(directionalLight)
+scene.add(directionalLight.target)
+
+directionalLight.target.updateMatrixWorld()
+directionalLight.updateMatrixWorld()
+
+const pointLightHelper2 = new THREE.PointLightHelper(directionalLight)
+scene.add(pointLightHelper2)
+
+const helper2 = new THREE.CameraHelper(directionalLight.shadow.camera)
+scene.add(helper2)
+
+// Ambient light
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 2)
+scene.add(ambientLight)
 
 // FBX Loader
 let fbxModel
@@ -38,12 +50,29 @@ loader.load(
     fbx.position.set(0, -2, 0) // Adjust position if needed
     scene.add(fbx) // Add the model directly
     fbxModel = fbx
+    fbx.castShadow = true
+    fbx.receiveShadow = true
   },
   undefined, // Progress callback not defined
   (error) => {
     console.error('An error happened', error)
   }
 )
+
+// Ground
+
+const groundGeometry = new THREE.PlaneGeometry(50, 50)
+const groundMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
+const ground = new THREE.Mesh(groundGeometry, groundMaterial)
+ground.rotation.x = -Math.PI / 2 // Rotate to horizontal
+ground.position.y = -2 // Adjust height
+ground.receiveShadow = true // Enable receiving shadows
+scene.add(ground)
+
+//
+
+renderer.shadowMap.enabled = true
+// pointLight.castShadow = true
 
 camera.position.set(0, 1, 5) // Adjust camera position
 const controls = new OrbitControls(camera, renderer.domElement)
