@@ -11,33 +11,38 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 )
+
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setClearColor(0x777777, 1) // Light grey background for contrast
 document.body.appendChild(renderer.domElement)
+renderer.shadowMap.type = THREE.VSMShadowMap
 
 // Lighting
 
 // For a directional light
 const directionalLight = new THREE.DirectionalLight(0xffffff, 5)
-directionalLight.position.set(0, 10, 20) // Position above the ground
+directionalLight.position.set(0, 20, 20) // Position above the ground
 directionalLight.target.position.set(0, 0, 0) // Target at the ground
 scene.add(directionalLight)
 scene.add(directionalLight.target)
 
 directionalLight.target.updateMatrixWorld()
 directionalLight.updateMatrixWorld()
+directionalLight.shadow.mapSize.width = 2048 // Higher resolution
+directionalLight.shadow.mapSize.height = 2048 // Higher resolution
+
+// Help light
 
 const pointLightHelper2 = new THREE.PointLightHelper(directionalLight)
 scene.add(pointLightHelper2)
-
 const helper2 = new THREE.CameraHelper(directionalLight.shadow.camera)
 scene.add(helper2)
 
 // Ambient light
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 2)
-scene.add(ambientLight)
+// const ambientLight = new THREE.AmbientLight(0xffffff, 2)
+// scene.add(ambientLight)
 
 // FBX Loader
 let fbxModel
@@ -52,6 +57,11 @@ loader.load(
     fbxModel = fbx
     fbx.castShadow = true
     fbx.receiveShadow = true
+    fbxModel.traverse(function (node) {
+      if (node.isMesh) {
+        node.castShadow = true
+      }
+    })
   },
   undefined, // Progress callback not defined
   (error) => {
@@ -72,14 +82,19 @@ scene.add(ground)
 //
 
 renderer.shadowMap.enabled = true
-// pointLight.castShadow = true
+directionalLight.castShadow = true
+directionalLight.shadow.bias = -0.001
 
 camera.position.set(0, 1, 5) // Adjust camera position
+
+// Controls
 const controls = new OrbitControls(camera, renderer.domElement)
+controls.enableDamping = true
+controls.dampingFactor = 0.12
 
 function animate() {
   if (fbxModel) {
-    fbxModel.rotation.y += 0.005
+    // fbxModel.rotation.y += 0.005
   }
   requestAnimationFrame(animate)
   controls.update()
