@@ -49,10 +49,11 @@ let fbxModel
 
 const loader = new FBXLoader()
 loader.load(
-  'https://gregoireduhem.github.io/threejsProd/newBag.fbx',
+  // 'https://gregoireduhem.github.io/threejsProd/newBag.fbx',
+  'ring.fbx',
   (fbx) => {
     fbx.scale.set(0.1, 0.1, 0.1) // Scale if needed
-    fbx.position.set(0, -2, 0) // Adjust position if needed
+    fbx.position.set(0, -1, 0) // Adjust position if needed
     scene.add(fbx) // Add the model directly
     fbxModel = fbx
     fbx.castShadow = true
@@ -94,7 +95,7 @@ controls.dampingFactor = 0.12
 
 function animate() {
   if (fbxModel) {
-    // fbxModel.rotation.y += 0.005
+    fbxModel.rotation.y += 0.005
   }
   requestAnimationFrame(animate)
   controls.update()
