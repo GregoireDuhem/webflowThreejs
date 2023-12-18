@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+// import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 
 const hdrTextureUrl = new URL('../../public/KitchenPierre.hdr', import.meta.url)
@@ -30,24 +31,33 @@ renderer.toneMappingExposure = 1.8
 const loader = new RGBELoader()
 loader.load(hdrTextureUrl, function (texture) {
   texture.mapping = THREE.EquirectangularReflectionMapping
-  // scene.background = texture
+  scene.background = texture
   scene.environment = texture
 })
 
-const fbxLoader = new FBXLoader()
-fbxLoader.load('ring.fbx', (fbxModel) => {
-  console.log(fbxModel.getObjectByName('gold2002'))
-  fbxModel.getObjectByName('gold2002').material.color.setHex(0x00ff00)
-  fbxModel.traverse((child) => {
-    if (child.isMesh) {
-      child.material.roughness = 0
-      child.material.metalness = 1.4
-      child.material.envMap = texture
-    }
-  })
+let gltfModel
 
-  scene.add(fbxModel)
-})
+const loaderr = new GLTFLoader()
+loaderr.load(
+  'ringg.gltf',
+  (gltf) => {
+    gltf.scene.scale.set(50, 50, 50) // Scale if needed
+    gltf.scene.position.set(0, 0, 0) // Adjust position if needed
+    scene.add(gltf.scene) // Add the model directly
+    gltfModel = gltf.scene
+    gltf.scene.castShadow = true
+    gltf.scene.receiveShadow = true
+    gltfModel.traverse(function (node) {
+      if (node.isMesh) {
+        node.castShadow = true
+      }
+    })
+  },
+  undefined, // Progress callback not defined
+  (error) => {
+    console.error('An error happened', error)
+  }
+)
 
 function animate() {
   renderer.render(scene, camera)

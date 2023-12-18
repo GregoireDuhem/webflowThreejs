@@ -1,8 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
-// import { Reflector } from 'three/examples/jsm/objects/Reflector.js'
-// import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(
@@ -19,8 +17,6 @@ document.body.appendChild(renderer.domElement)
 renderer.shadowMap.type = THREE.VSMShadowMap
 
 // Lighting
-
-// For a directional light
 const directionalLight = new THREE.DirectionalLight(0xffffff, 5)
 directionalLight.position.set(0, 20, 20) // Position above the ground
 directionalLight.target.position.set(0, 0, 0) // Target at the ground
@@ -32,33 +28,26 @@ directionalLight.updateMatrixWorld()
 directionalLight.shadow.mapSize.width = 2048 // Higher resolution
 directionalLight.shadow.mapSize.height = 2048 // Higher resolution
 
-// Help light
-
+// Helper lights
 const pointLightHelper2 = new THREE.PointLightHelper(directionalLight)
 scene.add(pointLightHelper2)
 const helper2 = new THREE.CameraHelper(directionalLight.shadow.camera)
 scene.add(helper2)
 
-// Ambient light
+// GLTF Loader
+let gltfModel
 
-// const ambientLight = new THREE.AmbientLight(0xffffff, 2)
-// scene.add(ambientLight)
-
-// FBX Loader
-let fbxModel
-
-const loader = new FBXLoader()
+const loader = new GLTFLoader()
 loader.load(
-  // 'https://gregoireduhem.github.io/threejsProd/newBag.fbx',
-  'ring.fbx',
-  (fbx) => {
-    fbx.scale.set(0.1, 0.1, 0.1) // Scale if needed
-    fbx.position.set(0, -1, 0) // Adjust position if needed
-    scene.add(fbx) // Add the model directly
-    fbxModel = fbx
-    fbx.castShadow = true
-    fbx.receiveShadow = true
-    fbxModel.traverse(function (node) {
+  'WaterBottle.gltf',
+  (gltf) => {
+    gltf.scene.scale.set(1, 1, 1) // Scale if needed
+    gltf.scene.position.set(0, 0, 0) // Adjust position if needed
+    scene.add(gltf.scene) // Add the model directly
+    gltfModel = gltf.scene
+    gltf.scene.castShadow = true
+    gltf.scene.receiveShadow = true
+    gltfModel.traverse(function (node) {
       if (node.isMesh) {
         node.castShadow = true
       }
@@ -71,7 +60,6 @@ loader.load(
 )
 
 // Ground
-
 const groundGeometry = new THREE.PlaneGeometry(50, 50)
 const groundMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
 const ground = new THREE.Mesh(groundGeometry, groundMaterial)
@@ -80,25 +68,25 @@ ground.position.y = -2 // Adjust height
 ground.receiveShadow = true // Enable receiving shadows
 scene.add(ground)
 
-//
-
+// Renderer and shadow settings
 renderer.shadowMap.enabled = true
 directionalLight.castShadow = true
 directionalLight.shadow.bias = -0.001
 
+// Camera and controls
 camera.position.set(0, 1, 5) // Adjust camera position
-
-// Controls
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
 controls.dampingFactor = 0.12
 
+// Animation loop
 function animate() {
-  if (fbxModel) {
-    fbxModel.rotation.y += 0.005
+  if (gltfModel) {
+    // gltfModel.rotation.y += 0.005
   }
   requestAnimationFrame(animate)
   controls.update()
   renderer.render(scene, camera)
 }
+
 export default animate
